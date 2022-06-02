@@ -1,4 +1,5 @@
 /* eslint-disable */
+declare module "vue-seamless-scroll/src";
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>

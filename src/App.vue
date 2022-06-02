@@ -6,7 +6,7 @@
   <section class="mainbox">
     <!--  行1 begin  -->
     <div class="line">
-      <div class="line1 panel bar">
+      <div class="line1 panel bar" ref="panelRef">
         <h2>分析3天内将超期</h2>
         <div ref="chart1" class="chart"></div>
         <div class="panel-footer"></div>
@@ -25,10 +25,14 @@
     <!--  行1 end  -->
 
     <div class="subBox">
-      <div class="column">
+      <div class="column" :style="{ width: `${panelWidth}px` }">
         <div class="panel">
           <h2>开发延期人员</h2>
-          <scroll-table :names="devNames" :counts="devCounts" />
+          <scroll-table
+            :names="devNames"
+            :counts="devCounts"
+            :width="panelWidth"
+          />
           <div class="panel-footer"></div>
         </div>
         <div class="panel">
@@ -37,17 +41,21 @@
           <div class="panel-footer"></div>
         </div>
       </div>
-      <div class="column">
+      <div class="column" :style="{ width: `${panelWidth}px` }">
         <div class="panel" style="height: calc(3.875rem * 2 + 0.1875rem)">
           <h2>需求管理平台延期</h2>
           <div ref="chart6" class="chart mid"></div>
           <div class="panel-footer"></div>
         </div>
       </div>
-      <div class="column">
+      <div class="column" :style="{ width: `${panelWidth}px` }">
         <div class="panel">
           <h2>测试延期人员</h2>
-          <scroll-table :names="testNames" :counts="testCounts" />
+          <scroll-table
+            :names="testNames"
+            :counts="testCounts"
+            :width="panelWidth"
+          />
           <div class="panel-footer"></div>
         </div>
         <div class="panel">
@@ -66,18 +74,32 @@ import "./components/flexible";
 import { onMounted, onUnmounted, reactive, ref } from "vue";
 import * as echarts from "echarts";
 
+type EChartsOption = echarts.EChartsOption;
+type EChartsType = echarts.EChartsType;
+
 let time = ref<string>("");
 let interval = ref<number>();
+const panelRef = ref<HTMLElement>();
 
-let chart1 = ref<HTMLElement>();
-let chart2 = ref<HTMLElement>();
-let chart3 = ref<HTMLElement>();
-let chart4 = ref<HTMLElement>();
-let chart5 = ref<HTMLElement>();
+const chart1 = ref<HTMLElement>();
+const chart2 = ref<HTMLElement>();
+const chart3 = ref<HTMLElement>();
+const chart4 = ref<HTMLElement>();
+const chart5 = ref<HTMLElement>();
+const chart6 = ref<HTMLElement>();
+
+let myChart1 = ref<EChartsType>();
+let myChart2 = ref<EChartsType>();
+let myChart3 = ref<EChartsType>();
+let myChart4 = ref<EChartsType>();
+let myChart5 = ref<EChartsType>();
+let myChart6 = ref<EChartsType>();
 
 let devNames = ref<string[]>([
   "石润杰",
   "石润杰",
+  "石润杰",
+  "石润杰",
   "test3",
   "test4",
   "test5",
@@ -88,24 +110,12 @@ let devNames = ref<string[]>([
   "test10",
   "test11",
 ]);
-let devCounts = ref<number[]>([11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
+let devCounts = ref<number[]>([13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
 
-let testNames = ref<string[]>([
-  "test1",
-  "test2",
-  "test3",
-  "test4",
-  "test5",
-  "test6",
-  "test7",
-  "test8",
-  "test9",
-  "test10",
-  "test11",
-]);
-let testCounts = ref<number[]>([11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
+let testNames = ref<string[]>(["test1", "test2", "test3", "test4", "test5"]);
+let testCounts = ref<number[]>([11, 10, 9, 8, 7]);
 
-let option1 = reactive({
+let option1 = reactive<EChartsOption>({
   color: ["#2f89cf"],
   tooltip: {
     trigger: "axis",
@@ -124,145 +134,239 @@ let option1 = reactive({
   xAxis: [
     {
       type: "category",
-      data: [] as string[],
+      // data: [] as string[],
       axisTick: {
         alignWithLabel: true,
       },
       axisLabel: {
-        textStyle: {
-          color: "rgba(255,255,255,.6)",
-          fontSize: "12",
-        },
+        color: "rgba(255,255,255,.6)",
+        fontSize: "12",
       },
       axisLine: {
         show: true,
       },
+      animationDuration: 300,
+      animationDurationUpdate: 300,
     },
   ],
   yAxis: [
     {
+      max: "dataMax",
       type: "value",
       axisLabel: {
-        textStyle: {
-          color: "rgba(255,255,255,.6)",
-          fontSize: "12",
-        },
+        color: "rgba(255,255,255,.6)",
+        fontSize: "12",
       },
       axisLine: {
-        lineStyle: {
-          color: "rgba(255,255,255,.1)",
-          // width: 1,
-          // type: "solid"
-        },
+        show: false,
+        // lineStyle: {
+        //   color: "rgba(255,255,255,.1)",
+        // },
       },
       splitLine: {
+        show: false,
         lineStyle: {
           color: "rgba(255,255,255,.1)",
         },
       },
+      animationDuration: 300,
+      animationDurationUpdate: 300,
     },
   ],
   series: [
     {
-      name: "",
+      realtimeSort: true,
       type: "bar",
       barWidth: "30%",
-      data: [] as number[],
-      itemStyle: {
-        barBorderRadius: 5,
+      // data: [] as number[],
+      label: {
+        show: true,
+        valueAnimation: true,
       },
     },
   ],
+  animationDuration: 0,
+  animationDurationUpdate: 3000,
+  animationEasing: "linear",
+  animationEasingUpdate: "linear",
 });
+let option2 = reactive<EChartsOption>({
+  tooltip: {
+    trigger: "axis",
+    axisPointer: {
+      type: "shadow",
+    },
+  },
+  grid: {
+    left: "3%",
+    right: "4%",
+    bottom: "3%",
+    containLabel: true,
+  },
+  xAxis: {
+    type: "value",
+    splitLine: {
+      show: false,
+    },
+  },
+  yAxis: {
+    type: "category",
+    data: ["Brazil", "Indonesia", "USA", "India", "China", "World"],
+  },
+  series: [
+    {
+      type: "bar",
+      data: [18203, 23489, 29034, 104970, 131744, 630230],
+      label: {
+        show: true,
+        valueAnimation: true,
+      },
+    },
+  ],
+  animationDuration: 0,
+  animationDurationUpdate: 3000,
+  animationEasing: "linear",
+  animationEasingUpdate: "linear",
+});
+
+let panelWidth = ref<number>();
 
 function setChart1() {
   // 实例化对象
-  let myChart = echarts.init(chart1.value as HTMLElement);
+  myChart1.value = echarts.init(chart1.value as HTMLElement);
   // 指定配置和数据
   let name = ["旅游", "教培", "游戏", "医疗", "电商", "社交", "金融"];
   let count = [2, 3, 3, 9, 15, 12, 6];
-  let option = Object.assign({}, option1);
-  option.xAxis[0].data = name;
-  option.series[0].data = count;
 
   // 把配置给实例对象
-  myChart.setOption(option);
-  window.addEventListener("resize", function () {
-    myChart.resize();
+  myChart1.value.setOption(option1);
+  myChart1.value.setOption<echarts.EChartsOption>({
+    xAxis: [
+      {
+        data: name,
+      },
+    ],
+    series: [
+      {
+        type: "bar",
+        data: count,
+      },
+    ],
   });
 }
 
 function setChart2() {
   // 基于准备好的dom，初始化echarts实例
-  let myChart = echarts.init(chart2.value as HTMLElement);
+  myChart2.value = echarts.init(chart2.value as HTMLElement);
 
   // 指定配置和数据
   let name = ["旅游", "教培", "游戏", "医疗", "电商", "社交", "金融"];
   let count = [2, 3, 3, 9, 15, 12, 6];
-  let option = Object.assign({}, option1);
-  option.xAxis[0].data = name;
-  option.series[0].data = count;
 
   // 3. 把配置和数据给实例对象
-  myChart.setOption(option);
+  myChart2.value.setOption(option1);
 
-  window.addEventListener("resize", function () {
-    myChart.resize();
+  myChart2.value.setOption<echarts.EChartsOption>({
+    xAxis: [
+      {
+        data: name,
+      },
+    ],
+    series: [
+      {
+        type: "bar",
+        data: count,
+      },
+    ],
   });
 }
 
 function setChart3() {
   // 基于准备好的dom，初始化echarts实例
-  let myChart = echarts.init(chart3.value as HTMLElement);
+  myChart3.value = echarts.init(chart3.value as HTMLElement);
 
   // 指定配置和数据
   let name = ["旅游", "教培", "游戏", "医疗", "电商", "社交", "金融"];
   let count = [2, 3, 3, 9, 15, 12, 6];
-  let option = Object.assign({}, option1);
-  option.xAxis[0].data = name;
-  option.series[0].data = count;
 
   // 使用刚指定的配置项和数据显示图表。
-  myChart.setOption(option);
-  window.addEventListener("resize", function () {
-    myChart.resize();
+  myChart3.value.setOption(option1);
+
+  myChart3.value.setOption<echarts.EChartsOption>({
+    xAxis: [
+      {
+        data: name,
+      },
+    ],
+    series: [
+      {
+        type: "bar",
+        data: count,
+      },
+    ],
   });
 }
 
 function setChart4() {
   // 基于准备好的dom，初始化echarts实例
-  let myChart = echarts.init(chart4.value as HTMLElement);
+  myChart4.value = echarts.init(chart4.value as HTMLElement);
 
   // 指定配置和数据
   let name = ["旅游", "教培", "游戏", "医疗", "电商", "社交", "金融"];
   let count = [2, 3, 3, 9, 15, 12, 6];
-  let option = Object.assign({}, option1);
-  option.xAxis[0].data = name;
-  option.series[0].data = count;
 
   // 使用刚指定的配置项和数据显示图表。
-  myChart.setOption(option);
-  window.addEventListener("resize", function () {
-    myChart.resize();
+  myChart4.value.setOption(option1);
+
+  myChart4.value.setOption<echarts.EChartsOption>({
+    xAxis: [
+      {
+        data: name,
+      },
+    ],
+    series: [
+      {
+        type: "bar",
+        data: count,
+      },
+    ],
   });
 }
 
 function setChart5() {
   // 基于准备好的dom，初始化echarts实例
-  let myChart = echarts.init(chart5.value as HTMLElement);
+  myChart5.value = echarts.init(chart5.value as HTMLElement);
 
   // 指定配置和数据
   let name = ["旅游", "教培", "游戏", "医疗", "电商", "社交", "金融"];
   let count = [2, 3, 3, 9, 15, 12, 6];
-  let option = Object.assign({}, option1);
-  option.xAxis[0].data = name;
-  option.series[0].data = count;
 
   // 使用刚指定的配置项和数据显示图表。
-  myChart.setOption(option);
-  window.addEventListener("resize", function () {
-    myChart.resize();
+  myChart5.value.setOption(option1);
+
+  myChart5.value.setOption<echarts.EChartsOption>({
+    xAxis: [
+      {
+        data: name,
+      },
+    ],
+    series: [
+      {
+        type: "bar",
+        data: count,
+      },
+    ],
   });
+}
+
+function setChart6() {
+  // 基于准备好的dom，初始化echarts实例
+  myChart6.value = echarts.init(chart6.value as HTMLElement);
+
+  // 指定配置和数据
+
+  // 使用刚指定的配置项和数据显示图表。
+  myChart6.value.setOption(option2);
 }
 
 onMounted(() => {
@@ -271,6 +375,22 @@ onMounted(() => {
   setChart3();
   setChart4();
   setChart5();
+  setChart6();
+
+  if (panelRef.value) panelWidth.value = panelRef.value.offsetWidth;
+  else panelWidth.value = 450;
+
+  window.addEventListener("resize", function () {
+    if (panelRef.value) panelWidth.value = panelRef.value.offsetWidth;
+    else panelWidth.value = 450;
+
+    if (myChart1.value) myChart1.value.resize();
+    if (myChart2.value) myChart2.value.resize();
+    if (myChart3.value) myChart3.value.resize();
+    if (myChart4.value) myChart4.value.resize();
+    if (myChart5.value) myChart5.value.resize();
+    if (myChart6.value) myChart6.value.resize();
+  });
 
   interval.value = setInterval(() => {
     let date = new Date();
@@ -280,21 +400,23 @@ onMounted(() => {
     let h = date.getHours(); //获取时
     let m = date.getMinutes(); //获取分
     let s = date.getSeconds(); //获取秒
-    time.value =
-      "当前时间：" +
-      y +
-      "年" +
-      mt +
-      "月" +
-      day +
-      "-" +
-      h +
-      "时" +
-      m +
-      "分" +
-      s +
-      "秒";
+    time.value = `当前时间：${y}年${mt}月${day}日-${h}时${m}分${s}秒`;
   }, 1000);
+
+  setInterval(() => {
+    let data = [];
+    for (let i = 0; i < 7; i++) {
+      data.push(Math.round(Math.random() * 10));
+    }
+    if (myChart1.value)
+      myChart1.value.setOption<echarts.EChartsOption>({
+        series: [
+          {
+            data,
+          },
+        ],
+      });
+  }, 10000);
 });
 
 onUnmounted(() => {
@@ -355,7 +477,7 @@ header .showTime {
   display: flex;
 }
 .mainbox .line .line1 {
-  width: 33.33%;
+  flex: 1;
 }
 .mainbox .subBox {
   display: flex;
