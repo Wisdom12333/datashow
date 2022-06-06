@@ -1,6 +1,6 @@
 <template>
   <header>
-    <h1>任务进度-概览</h1>
+    <h1></h1>
     <div class="showTime">当前时间：{{ time }}</div>
   </header>
   <section class="mainbox">
@@ -25,7 +25,7 @@
     <!--  行1 end  -->
 
     <div class="subBox">
-      <div class="column" :style="{ width: `${panelWidth}px` }">
+      <div class="column">
         <div class="panel">
           <h2>开发延期人员</h2>
           <scroll-table
@@ -41,14 +41,14 @@
           <div class="panel-footer"></div>
         </div>
       </div>
-      <div class="column" :style="{ width: `${panelWidth}px` }">
+      <div class="column">
         <div class="panel" style="height: calc(3.875rem * 2 + 0.1875rem)">
           <h2>需求管理平台延期</h2>
           <div ref="chart6" class="chart mid"></div>
           <div class="panel-footer"></div>
         </div>
       </div>
-      <div class="column" :style="{ width: `${panelWidth}px` }">
+      <div class="column">
         <div class="panel">
           <h2>测试延期人员</h2>
           <scroll-table
@@ -98,8 +98,6 @@ let myChart6 = ref<EChartsType>();
 let devNames = ref<string[]>([
   "石润杰",
   "石润杰",
-  "石润杰",
-  "石润杰",
   "test3",
   "test4",
   "test5",
@@ -110,7 +108,7 @@ let devNames = ref<string[]>([
   "test10",
   "test11",
 ]);
-let devCounts = ref<number[]>([13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
+let devCounts = ref<number[]>([11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
 
 let testNames = ref<string[]>(["test1", "test2", "test3", "test4", "test5"]);
 let testCounts = ref<number[]>([11, 10, 9, 8, 7]);
@@ -231,7 +229,7 @@ let option2 = reactive<EChartsOption>({
 
 let panelWidth = ref<number>();
 
-function setChart1() {
+function setChart1(): void {
   // 实例化对象
   myChart1.value = echarts.init(chart1.value as HTMLElement);
   // 指定配置和数据
@@ -255,7 +253,7 @@ function setChart1() {
   });
 }
 
-function setChart2() {
+function setChart2(): void {
   // 基于准备好的dom，初始化echarts实例
   myChart2.value = echarts.init(chart2.value as HTMLElement);
 
@@ -281,7 +279,7 @@ function setChart2() {
   });
 }
 
-function setChart3() {
+function setChart3(): void {
   // 基于准备好的dom，初始化echarts实例
   myChart3.value = echarts.init(chart3.value as HTMLElement);
 
@@ -307,7 +305,7 @@ function setChart3() {
   });
 }
 
-function setChart4() {
+function setChart4(): void {
   // 基于准备好的dom，初始化echarts实例
   myChart4.value = echarts.init(chart4.value as HTMLElement);
 
@@ -333,7 +331,7 @@ function setChart4() {
   });
 }
 
-function setChart5() {
+function setChart5(): void {
   // 基于准备好的dom，初始化echarts实例
   myChart5.value = echarts.init(chart5.value as HTMLElement);
 
@@ -359,7 +357,7 @@ function setChart5() {
   });
 }
 
-function setChart6() {
+function setChart6(): void {
   // 基于准备好的dom，初始化echarts实例
   myChart6.value = echarts.init(chart6.value as HTMLElement);
 
@@ -367,6 +365,15 @@ function setChart6() {
 
   // 使用刚指定的配置项和数据显示图表。
   myChart6.value.setOption(option2);
+}
+
+function resize(): void {
+  if (myChart1.value) myChart1.value.resize();
+  if (myChart2.value) myChart2.value.resize();
+  if (myChart3.value) myChart3.value.resize();
+  if (myChart4.value) myChart4.value.resize();
+  if (myChart5.value) myChart5.value.resize();
+  if (myChart6.value) myChart6.value.resize();
 }
 
 onMounted(() => {
@@ -384,12 +391,7 @@ onMounted(() => {
     if (panelRef.value) panelWidth.value = panelRef.value.offsetWidth;
     else panelWidth.value = 450;
 
-    if (myChart1.value) myChart1.value.resize();
-    if (myChart2.value) myChart2.value.resize();
-    if (myChart3.value) myChart3.value.resize();
-    if (myChart4.value) myChart4.value.resize();
-    if (myChart5.value) myChart5.value.resize();
-    if (myChart6.value) myChart6.value.resize();
+    resize();
   });
 
   interval.value = setInterval(() => {
@@ -410,13 +412,11 @@ onMounted(() => {
     }
     if (myChart1.value)
       myChart1.value.setOption<echarts.EChartsOption>({
-        series: [
-          {
-            data,
-          },
-        ],
+        series: [{ data }],
       });
   }, 10000);
+
+  setTimeout(() => resize(), 100);
 });
 
 onUnmounted(() => {
